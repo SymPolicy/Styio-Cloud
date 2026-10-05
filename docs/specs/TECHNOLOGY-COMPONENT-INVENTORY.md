@@ -4,7 +4,7 @@
 
 **Last updated:** 2026-04-24
 
-This document is the repository-local maintenance rule for the manifest inventory audited by `styio-audit`. The canonical audit module must list the same surfaces in `for-styio-cloud/module.json`; if this document and the audit manifest diverge, the change is not closed.
+This document is the repository-local maintenance rule for the manifest inventory audited by `General-Auditor`. The canonical audit module must list the same surfaces in `for-styio-cloud/module.json`; if this document and the audit manifest diverge, the change is not closed.
 
 ## Required Inventory Fields
 
@@ -62,7 +62,7 @@ Dependency manifest surfaces:
 
 ## Maintenance Rule
 
-Update this document and the matching `styio-audit` project module in the same change whenever any of these occur:
+Update this document and the matching `General-Auditor` project module in the same change whenever any of these occur:
 
 1. A language, SDK, runtime, build system, CI system, package manager, contract format, or generated-code tool is added or removed.
 2. A first-party service-kernel, contract, registry, mirror, regional-node, gate, or workflow boundary is added, renamed, or retired.

@@ -1,57 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-usage() {
-  cat <<'USAGE'
-Usage: scripts/audit-gate.sh [options]
-
-Run the external styio-audit gate against this repository.
-
-Options:
-  --audit-bin <path>  Explicit styio-audit executable
-  -h, --help          Show this help
-USAGE
-}
-
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-AUDIT_BIN="${STYIO_AUDIT_BIN:-}"
-
+AUDITOR_ROOT="${GENERAL_AUDITOR_ROOT:-}"
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --audit-bin)
-      AUDIT_BIN="$2"
-      shift 2
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    *)
-      echo "Unknown option: $1" >&2
-      usage >&2
-      exit 2
-      ;;
+    --audit-root) AUDITOR_ROOT="${2:?Missing auditor root}"; shift 2 ;;
+    -h|--help) echo 'Usage: scripts/audit-gate.sh [--audit-root <trusted General-Auditor checkout>]'; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; exit 2 ;;
   esac
 done
-
-if [[ -z "$AUDIT_BIN" ]]; then
-  if [[ -x "$ROOT/../styio-audit/bin/styio-audit" ]]; then
-    AUDIT_BIN="$ROOT/../styio-audit/bin/styio-audit"
-  elif [[ -x "<styio-audit-bin>" ]]; then
-    AUDIT_BIN="<styio-audit-bin>"
-  elif command -v styio-audit >/dev/null 2>&1; then
-    AUDIT_BIN="$(command -v styio-audit)"
-  fi
-fi
-
-if [[ -z "$AUDIT_BIN" || ! -x "$AUDIT_BIN" ]]; then
-  echo "styio-audit executable not found; set STYIO_AUDIT_BIN or pass --audit-bin" >&2
-  exit 2
-fi
-
-AUDIT_ROOT="$(cd "$(dirname "$AUDIT_BIN")/.." && pwd)"
-if git -C "$AUDIT_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  echo "styio-audit commit: $(git -C "$AUDIT_ROOT" rev-parse HEAD)"
-fi
-
-"$AUDIT_BIN" gate --repo "$ROOT" --project styio-cloud
+: "${AUDITOR_ROOT:?Set GENERAL_AUDITOR_ROOT or pass --audit-root}"
+report="$(git -C "$ROOT" rev-parse --path-format=absolute --git-path general-auditor)"
+python3 -I "$AUDITOR_ROOT/action_entry.py" scan --policy-root "$AUDITOR_ROOT" \
+  --directory "$ROOT" --repository "SymPolicy/Styio-Cloud" --scope history --output "$report/history.json"
+python3 -I "$AUDITOR_ROOT/action_entry.py" scan --policy-root "$AUDITOR_ROOT" \
+  --directory "$ROOT" --repository "SymPolicy/Styio-Cloud" --scope worktree --output "$report/worktree.json"

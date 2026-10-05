@@ -14,8 +14,8 @@ Options:
   --base <ref>              Base ref for team-docs-gate branch checks
   --range <rev-range>       Explicit revision range for repo-hygiene push mode
   --skip-health             Skip native/Python health checks (docs/process-only deliveries)
-  --skip-audit              Skip external styio-audit gate
-  --audit-bin <path>        Explicit styio-audit executable
+  --skip-audit              Skip external General-Auditor gate
+  --audit-root <path>        Trusted General-Auditor checkout
   --build-dir <dir>         Build directory for CMake validation
   --cmake-arg <arg>         Extra CMake configure argument; repeatable
   -h, --help                Show this help
@@ -83,7 +83,7 @@ while [[ $# -gt 0 ]]; do
       RUN_AUDIT=0
       shift
       ;;
-    --audit-bin)
+    --audit-root)
       AUDIT_BIN="$2"
       shift 2
       ;;
@@ -112,7 +112,7 @@ DOCS_GATE_CMD=(./scripts/docs-gate.sh)
 AUDIT_CMD=(./scripts/audit-gate.sh)
 
 if [[ -n "$AUDIT_BIN" ]]; then
-  AUDIT_CMD+=(--audit-bin "$AUDIT_BIN")
+  AUDIT_CMD+=(--audit-root "$AUDIT_BIN")
 fi
 
 case "$MODE" in
@@ -146,7 +146,7 @@ run_cmd "${DOCS_GATE_CMD[@]}"
 if [[ "$RUN_AUDIT" -eq 1 ]]; then
   run_cmd "${AUDIT_CMD[@]}"
 else
-  log "styio-audit skipped"
+  log "General-Auditor skipped"
 fi
 run_contract_gates
 
