@@ -9,7 +9,7 @@ validation, external audit validation, and repository governance gates.
 - `registry-v2-vm-smoke.py` validates a deployed VM registry node.
 - `deploy-registry-vm.sh` installs the registry server bundle onto a Linux VM.
 - `package-registry-server.sh` creates the VM deployment tarball.
-- `audit-gate.sh` runs the external `styio-audit` gate for platform delivery.
+- `audit-gate.sh` runs the external `General-Auditor` gate for platform delivery.
 - `docs-audit.py`, `docs-index.py`, `team-docs-gate.py`, and
   `repo-hygiene-gate.py` enforce docs and repository governance.
 
